@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>AWAKE KAMAKURA 変化チェック 集計</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f6f1ea;--card:#fffdf9;--ink:#3b342d;--muted:#8a7f73;--accent:#b8673f;--accent-soft:#f3e2d6;--line:#e6dccf;--sea:#5f8a8b;--sea-soft:#dfeaea}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans JP",system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:32px 20px 64px}
+  header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:22px}
+  .brand{font-family:"Noto Serif JP",serif;letter-spacing:.35em;font-size:12px;color:var(--sea);margin:0 0 4px}
+  h1{font-family:"Noto Serif JP",serif;font-weight:600;font-size:clamp(20px,4vw,26px);margin:0}
+  .meta{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:10px}
+  button{font:inherit;font-weight:700;border:none;border-radius:99px;padding:9px 18px;cursor:pointer;background:var(--accent);color:#fff;font-size:13.5px}
+  button.ghost{background:transparent;color:var(--muted);border:1.5px solid var(--line)}
+  .banner{background:#fff6dd;border:1px solid #ecd9a4;color:#7a6224;border-radius:12px;padding:10px 14px;font-size:13px;margin-bottom:18px;display:none}
+  .banner.show{display:block}
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+  .kpi{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:16px 18px}
+  .kpi .l{font-size:12.5px;color:var(--muted)}
+  .kpi .v{font-family:"Noto Serif JP",serif;font-size:32px;color:var(--accent);line-height:1.3}
+  .kpi .v small{font-size:14px;color:var(--muted);margin-left:2px}
+  .kpi .v.txt{font-family:"Noto Sans JP",sans-serif;font-size:15px;font-weight:700;color:var(--ink);line-height:1.5;padding-top:6px}
+  .card{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:20px 20px 18px;margin-bottom:16px}
+  .card h2{font-family:"Noto Serif JP",serif;font-size:16.5px;font-weight:600;margin:0 0 4px}
+  .card .sub{font-size:12.5px;color:var(--muted);margin:0 0 16px}
+  .rank{display:grid;gap:11px}
+  .row{display:grid;grid-template-columns:minmax(150px,260px) 1fr 92px;align-items:center;gap:12px;font-size:14px}
+  .row .name{font-weight:500}
+  .track{height:14px;background:#f1ebe3;border-radius:99px;overflow:hidden}
+  .fill{height:100%;background:var(--accent);border-radius:99px;width:0;transition:width .6s ease}
+  .row .val{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted);font-size:13px}
+  .row .val b{color:var(--ink);font-size:15px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .cols{display:flex;align-items:flex-end;gap:6px;height:170px;padding-top:18px;border-bottom:1.5px solid var(--line)}
+  .col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;position:relative}
+  .col .b{width:100%;max-width:34px;background:var(--sea);border-radius:6px 6px 0 0;min-height:2px;transition:height .6s ease}
+  .col .n{font-size:11px;color:var(--muted);margin-bottom:3px;font-variant-numeric:tabular-nums}
+  .xl{display:flex;gap:6px;margin-top:6px}
+  .xl span{flex:1;min-width:0;display:flex;justify-content:center;font-size:11px;color:var(--muted);white-space:nowrap;overflow:visible}
+  .comments{list-style:none;margin:0;padding:0;max-height:340px;overflow:auto;display:grid;gap:8px}
+  .comments li{background:#faf6f0;border-radius:10px;padding:10px 12px;font-size:14px}
+  .comments time{display:block;font-size:11.5px;color:var(--muted)}
+  .empty{color:var(--muted);font-size:13.5px}
+  .login{max-width:380px;margin:12vh auto 0;background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:28px 24px;text-align:center}
+  .login input{width:100%;font:inherit;font-size:15px;padding:11px 14px;border:1.5px solid var(--line);border-radius:12px;margin:14px 0 12px;background:#fff}
+  .login input:focus{outline:none;border-color:var(--accent)}
+  .err{color:#b23a3a;font-size:13px;min-height:1.4em;margin-top:8px}
+  .hidden{display:none!important}
+  @media (max-width:720px){
+    .kpis{grid-template-columns:1fr 1fr}.kpis .kpi:last-child{grid-column:span 2}
+    .grid2{grid-template-columns:1fr}
+    .row{grid-template-columns:1fr 82px;row-gap:4px}.row .name{grid-column:span 2}
+  }
+  @media print{button,.meta button{display:none}body{background:#fff}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <section class="login hidden" id="login">
+    <p class="brand">AWAKE KAMAKURA</p>
+    <h1 style="font-size:20px">集計ページ</h1>
+    <form id="loginForm">
+      <input type="password" id="keyInput" placeholder="合言葉を入力" autocomplete="current-password">
+      <button type="submit" style="width:100%;padding:12px">表示する</button>
+    </form>
+    <div class="err" id="loginErr"></div>
+  </section>
+
+  <main id="dash" class="hidden">
+    <header>
+      <div>
+        <p class="brand">AWAKE KAMAKURA</p>
+        <h1>入会後の変化チェック 集計</h1>
+      </div>
+      <div class="meta">
+        <span id="updated"></span>
+        <button class="ghost" id="logout" type="button">ログアウト</button>
+        <button id="reload" type="button">更新</button>
+      </div>
+    </header>
+
+    <div class="banner" id="demoBanner">サンプルデータを表示しています。<code>config.js</code> に Google Apps Script のURLを設定すると、実際の回答が表示されます。</div>
+
+    <div class="kpis">
+      <div class="kpi"><div class="l">回答数</div><div class="v" id="kTotal">–</div></div>
+      <div class="kpi"><div class="l">1人あたりの変化の数（平均）</div><div class="v" id="kAvg">–</div></div>
+      <div class="kpi"><div class="l">いちばん多かった変化</div><div class="v txt" id="kTop">–</div></div>
+    </div>
+
+    <div class="card">
+      <h2>変化を感じた人の割合</h2>
+      <p class="sub">回答者のうち、その項目にチェックした人の割合（多い順）</p>
+      <div class="rank" id="rank"></div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h2>感じた変化の数の分布</h2>
+        <p class="sub">いくつの項目にチェックしたか（人数）</p>
+        <div class="cols" id="dist"></div>
+        <div class="xl" id="distX"></div>
+      </div>
+      <div class="card">
+        <h2>日別の回答数</h2>
+        <p class="sub">直近30日</p>
+        <div class="cols" id="daily"></div>
+        <div class="xl" id="dailyX"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>そのほかの変化（自由記入）</h2>
+      <p class="sub" id="cSub">新しい順</p>
+      <ul class="comments" id="comments"></ul>
+    </div>
+  </main>
+</div>
+
+<script src="config.js"></script>
+<script>
+const ENDPOINT = (window.AWAKE_CONFIG||{}).ENDPOINT || '';
+const DEMO = !ENDPOINT;
+const $ = id => document.getElementById(id);
+const store = {
+  get(){try{return sessionStorage.getItem('awakeKey')||''}catch(e){return ''}},
+  set(v){try{sessionStorage.setItem('awakeKey',v)}catch(e){}},
+  clear(){try{sessionStorage.removeItem('awakeKey')}catch(e){}}
+};
+let KEY = store.get();
+
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+
+function demoData(){
+  const items=["体が芯から温まるようになった","体がやわらかくなった","姿勢がよくなった","肩こり・腰痛が軽くなった","体重のコントロールがしやすくなった","更年期の不調がやわらいだ","ぐっすり眠れるようになった","気持ちが落ち着き、イライラが減った","疲れにくくなった・体力がついた","自分の体と向き合う時間ができた"];
+  const counts=[58,49,41,37,22,14,33,29,31,46], dist=[0,6,9,12,13,10,7,5,3,2,1];
+  const daily={}; const t=new Date();
+  for(let i=29;i>=0;i--){const d=new Date(t);d.setDate(t.getDate()-i);daily[ymd(d)]=[1,3,2,0,4,2,1,5,3,2][i%10];}
+  return {ok:true,total:68,items,counts,dist,daily,updated:new Date().toISOString(),
+    comments:[{date:ymd(t),text:"朝の目覚めがすっきりするようになりました"},{date:ymd(t),text:"冷え性が気にならなくなった"},{date:ymd(t),text:"友人に「姿勢がきれいになったね」と言われた"}]};
+}
+
+async function load(){
+  $('reload').disabled=true;
+  try{
+    let data;
+    if(DEMO){ data=demoData(); }
+    else{
+      const res=await fetch(ENDPOINT+'?key='+encodeURIComponent(KEY)+'&t='+Date.now());
+      data=await res.json();
+    }
+    if(!data.ok){
+      if(data.error==='unauthorized'){ store.clear(); KEY=''; showLogin('合言葉が違います'); return; }
+      throw new Error(data.error||'error');
+    }
+    render(data);
+    $('login').classList.add('hidden'); $('dash').classList.remove('hidden');
+  }catch(e){
+    if($('dash').classList.contains('hidden')) showLogin('データを読み込めませんでした。URLとデプロイ設定を確認してください。');
+    else $('updated').textContent='読み込みに失敗しました';
+  }finally{ $('reload').disabled=false; }
+}
+
+function render(d){
+  $('demoBanner').classList.toggle('show',DEMO);
+  const total=d.total||0;
+  $('kTotal').innerHTML=total+'<small>件</small>';
+  const sumSel=d.dist.reduce((s,v,i)=>s+v*i,0);
+  $('kAvg').innerHTML=(total?(sumSel/total).toFixed(1):'0')+'<small>/ '+d.items.length+'</small>';
+  const order=d.items.map((name,i)=>({name,c:d.counts[i]})).sort((a,b)=>b.c-a.c);
+  $('kTop').textContent=total&&order[0].c?order[0].name:'–';
+  const up=new Date(d.updated);
+  $('updated').textContent='最終更新 '+up.toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+
+  $('rank').innerHTML=order.map(o=>{
+    const p=total?Math.round(o.c/total*100):0;
+    return `<div class="row"><span class="name">${esc(o.name)}</span><div class="track"><div class="fill" data-w="${p}"></div></div><span class="val"><b>${p}%</b>（${o.c}人）</span></div>`;
+  }).join('');
+
+  bars('dist','distX',d.dist,d.dist.map((_,i)=>i+'個'));
+  const days=[]; const t=new Date();
+  for(let i=29;i>=0;i--){const x=new Date(t);x.setDate(t.getDate()-i);days.push(ymd(x));}
+  bars('daily','dailyX',days.map(k=>d.daily[k]||0),days.map((k,i)=>i%5===4||i===29?(+k.slice(5,7))+'/'+(+k.slice(8)):''),true);
+
+  const cm=d.comments||[];
+  $('cSub').textContent=cm.length?`新しい順・${cm.length}件`:'';
+  $('comments').innerHTML=cm.length?cm.map(c=>`<li><time>${esc(c.date)}</time>${esc(c.text)}</li>`).join(''):'<li class="empty" style="background:none;padding:0">まだ記入はありません</li>';
+
+  requestAnimationFrame(()=>document.querySelectorAll('.fill').forEach(f=>f.style.width=f.dataset.w+'%'));
+}
+
+function bars(id,xid,vals,labels,compact){
+  const max=Math.max(1,...vals);
+  $(id).innerHTML=vals.map(v=>`<div class="col">${(!compact||v)?`<span class="n">${v}</span>`:''}<div class="b" style="height:${v/max*100*0.82}%"></div></div>`).join('');
+  $(id).style.gap=$(xid).style.gap=compact?'2px':'6px';
+  $(xid).innerHTML=labels.map(l=>`<span>${l}</span>`).join('');
+}
+
+function showLogin(msg){
+  $('dash').classList.add('hidden'); $('login').classList.remove('hidden');
+  $('loginErr').textContent=msg||''; $('keyInput').focus();
+}
+
+$('loginForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  KEY=$('keyInput').value.trim(); if(!KEY) return;
+  store.set(KEY); $('loginErr').textContent='読み込み中…'; load();
+});
+$('reload').addEventListener('click',load);
+$('logout').addEventListener('click',()=>{store.clear();KEY='';$('keyInput').value='';showLogin('');});
+
+if(DEMO||KEY) load(); else showLogin('');
+</script>
+</body>
+</html>

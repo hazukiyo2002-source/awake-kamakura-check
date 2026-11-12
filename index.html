@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AWAKE KAMAKURA 入会後の変化チェック</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f1ea; --card:#fffdf9; --ink:#3b342d; --muted:#8a7f73;
+    --accent:#b8673f; --accent-soft:#f3e2d6; --line:#e6dccf; --sea:#5f8a8b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Noto Sans JP",system-ui,sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:640px;margin:0 auto;padding:40px 20px 64px}
+  header{text-align:center;margin-bottom:28px}
+  .brand{font-family:"Noto Serif JP",serif;letter-spacing:.35em;font-size:13px;color:var(--sea);margin:0 0 10px}
+  h1{font-family:"Noto Serif JP",serif;font-weight:600;font-size:clamp(22px,5.4vw,28px);line-height:1.5;margin:0 0 10px}
+  .lead{color:var(--muted);font-size:14px;margin:0}
+  .progress{display:flex;align-items:center;gap:12px;margin:24px 0 14px;font-size:13px;color:var(--muted)}
+  .bar{flex:1;height:6px;background:var(--line);border-radius:99px;overflow:hidden}
+  .bar i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .35s ease}
+  .count b{color:var(--accent);font-size:18px}
+  ul{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+  label.item{display:flex;align-items:center;gap:14px;background:var(--card);border:1.5px solid var(--line);
+    border-radius:14px;padding:15px 16px;cursor:pointer;transition:border-color .2s,background .2s,transform .1s;user-select:none}
+  label.item:hover{border-color:#d6c3b0}
+  label.item:active{transform:scale(.99)}
+  label.item input{position:absolute;opacity:0;pointer-events:none}
+  .box{flex:none;width:24px;height:24px;border-radius:7px;border:2px solid #cdbfb0;display:grid;place-items:center;transition:all .2s;background:#fff}
+  .box svg{width:14px;height:14px;opacity:0;transform:scale(.5);transition:all .2s}
+  .num{flex:none;font-family:"Noto Serif JP",serif;font-size:13px;color:var(--muted);width:1.6em;text-align:right}
+  .txt{font-size:15.5px;font-weight:500}
+  label.item:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+  input:checked + .box{background:var(--accent);border-color:var(--accent)}
+  input:checked + .box svg{opacity:1;transform:scale(1)}
+  input:focus-visible + .box{outline:3px solid #e9b99c;outline-offset:2px}
+  .other{margin-top:16px}
+  .other label{font-size:14px;color:var(--muted);display:block;margin-bottom:6px}
+  textarea{width:100%;min-height:76px;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;
+    font:inherit;font-size:15px;background:var(--card);color:var(--ink);resize:vertical}
+  textarea:focus{outline:none;border-color:var(--accent)}
+  .actions{display:flex;gap:10px;margin-top:24px}
+  button{font:inherit;font-weight:700;border:none;border-radius:99px;padding:14px 22px;cursor:pointer;transition:opacity .2s,transform .1s}
+  button:active{transform:scale(.98)}
+  .primary{flex:1;background:var(--accent);color:#fff;font-size:16px}
+  .primary:disabled{opacity:.4;cursor:not-allowed}
+  .ghost{background:transparent;color:var(--muted);border:1.5px solid var(--line)}
+  .result{display:none;margin-top:28px;background:var(--card);border-radius:18px;padding:28px 22px;border:1.5px solid var(--line);text-align:center;animation:up .45s ease}
+  .result.show{display:block}
+  @keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .result .big{font-family:"Noto Serif JP",serif;font-size:15px;color:var(--muted);margin:0}
+  .result .score{font-family:"Noto Serif JP",serif;font-size:52px;color:var(--accent);line-height:1.2;margin:4px 0}
+  .result .score small{font-size:18px;color:var(--muted)}
+  .result h2{font-family:"Noto Serif JP",serif;font-size:19px;margin:6px 0 10px}
+  .result p.msg{font-size:14.5px;margin:0 0 18px;text-align:left}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:18px}
+  .chips span{font-size:12.5px;background:var(--accent-soft);color:#8f4e2f;border-radius:99px;padding:4px 11px}
+  .copy{background:var(--sea);color:#fff;font-size:14px}
+  .toast{font-size:12.5px;color:var(--sea);height:1.4em;margin-top:8px}
+  footer{text-align:center;font-size:12px;color:var(--muted);margin-top:36px;letter-spacing:.1em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="brand">AWAKE KAMAKURA</p>
+    <h1>入会して、<br>どんな変化がありましたか？</h1>
+    <p class="lead">あてはまるものをすべて選んでください（複数選択可）</p>
+  </header>
+
+  <div class="progress">
+    <div class="bar"><i id="bar"></i></div>
+    <div class="count"><b id="count">0</b> / <span id="total">0</span></div>
+  </div>
+
+  <ul id="list"></ul>
+
+  <div class="other">
+    <label for="otherText">そのほかに感じた変化があれば（任意）</label>
+    <textarea id="otherText" placeholder="例：朝の目覚めがよくなった など"></textarea>
+  </div>
+
+  <div class="actions">
+    <button class="ghost" id="reset" type="button">リセット</button>
+    <button class="primary" id="submit" type="button" disabled>結果を見る</button>
+  </div>
+
+  <section class="result" id="result" aria-live="polite">
+    <p class="big">あなたが感じた変化</p>
+    <div class="score"><span id="rScore">0</span><small> 個</small></div>
+    <h2 id="rTitle"></h2>
+    <div class="chips" id="rChips"></div>
+    <p class="msg" id="rMsg"></p>
+    <button class="copy" id="copy" type="button">結果をコピーする</button>
+    <div class="toast" id="toast"></div>
+  </section>
+
+  <footer>AWAKE KAMAKURA</footer>
+</div>
+
+<script>
+const ITEMS = [
+  "体が芯から温まるようになった",
+  "体がやわらかくなった",
+  "姿勢がよくなった",
+  "肩こり・腰痛が軽くなった",
+  "体重のコントロールがしやすくなった",
+  "更年期の不調がやわらいだ",
+  "ぐっすり眠れるようになった",
+  "気持ちが落ち着き、イライラが減った",
+  "疲れにくくなった・体力がついた",
+  "自分の体と向き合う時間ができた"
+];
+
+const list = document.getElementById('list');
+const check = '<svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3L13 4.5"/></svg>';
+ITEMS.forEach((t,i)=>{
+  const li=document.createElement('li');
+  li.innerHTML=`<label class="item"><span class="num">${i+1}</span><input type="checkbox" value="${i}"><span class="box">${check}</span><span class="txt">${t}</span></label>`;
+  list.appendChild(li);
+});
+document.getElementById('total').textContent=ITEMS.length;
+
+const boxes=[...list.querySelectorAll('input')];
+const bar=document.getElementById('bar'), countEl=document.getElementById('count'), submit=document.getElementById('submit');
+const result=document.getElementById('result');
+
+function selected(){return boxes.filter(b=>b.checked).map(b=>ITEMS[+b.value]);}
+function update(){
+  const n=selected().length;
+  countEl.textContent=n;
+  bar.style.width=(n/ITEMS.length*100)+'%';
+  submit.disabled = n===0 && !document.getElementById('otherText').value.trim();
+}
+boxes.forEach(b=>b.addEventListener('change',update));
+document.getElementById('otherText').addEventListener('input',update);
+
+function verdict(n){
+  if(n>=8) return ["からだも心も、大きく目覚めています","たくさんの変化を実感されていますね。続けてきた時間が、からだと心の両方にしっかり表れています。この調子で、これからもご自身のペースで楽しんでください。"];
+  if(n>=5) return ["変化がしっかり根づいてきています","いくつもの変化を感じていただけて嬉しいです。積み重ねが形になり始めている時期。ほかの項目にも、これから少しずつ変化が広がっていくはずです。"];
+  if(n>=2) return ["変化の芽が、育ちはじめています","からだの声に気づけるようになってきた証拠です。焦らず続けることで、感じられる変化はさらに増えていきます。"];
+  return ["はじめの一歩を感じています","小さな変化に気づけたことが、何よりの第一歩です。続けるほどに、からだは少しずつ応えてくれます。"];
+}
+
+let lastText='';
+submit.addEventListener('click',()=>{
+  const sel=selected(), n=sel.length;
+  const other=document.getElementById('otherText').value.trim();
+  const [title,msg]=verdict(n);
+  document.getElementById('rScore').textContent=n;
+  document.getElementById('rTitle').textContent=title;
+  document.getElementById('rMsg').textContent=msg;
+  const chips=document.getElementById('rChips'); chips.innerHTML='';
+  sel.forEach(s=>{const c=document.createElement('span');c.textContent=s;chips.appendChild(c);});
+  if(other){const c=document.createElement('span');c.textContent='その他：'+other;chips.appendChild(c);}
+  lastText=`【AWAKE KAMAKURA 入会後の変化チェック】\n実感した変化：${n}個 / ${ITEMS.length}個\n`+sel.map(s=>'・'+s).join('\n')+(other?`\n・その他：${other}`:'');
+  result.classList.add('show');
+  document.getElementById('toast').textContent='';
+  result.scrollIntoView({behavior:'smooth',block:'start'});
+});
+
+document.getElementById('copy').addEventListener('click',async()=>{
+  const t=document.getElementById('toast');
+  try{await navigator.clipboard.writeText(lastText);t.textContent='コピーしました';}
+  catch(e){t.textContent='コピーできませんでした。お手数ですが手動でコピーしてください';}
+});
+
+document.getElementById('reset').addEventListener('click',()=>{
+  boxes.forEach(b=>b.checked=false);
+  document.getElementById('otherText').value='';
+  result.classList.remove('show');
+  update();
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+update();
+</script>
+</body>
+</html>
