@@ -68,7 +68,7 @@
   <header>
     <p class="brand">AWAKE KAMAKURA</p>
     <h1>入会して、<br>どんな変化がありましたか？</h1>
-    <p class="lead">あてはまるものをすべて選んでください（複数選択可）</p>
+    <p class="lead">あてはまるものをすべて選んでください（複数選択可）<br><span style="font-size:12px">※ 回答は匿名で集計されます</span></p>
   </header>
 
   <div class="progress">
@@ -101,6 +101,7 @@
   <footer>AWAKE KAMAKURA</footer>
 </div>
 
+<script src="config.js"></script>
 <script>
 const ITEMS = [
   "体が芯から温まるようになった",
@@ -145,14 +146,23 @@ function verdict(n){
   return ["はじめの一歩を感じています","小さな変化に気づけたことが、何よりの第一歩です。続けるほどに、からだは少しずつ応えてくれます。"];
 }
 
-let lastText='';
+let lastText='', sent=false;
+function sendAnswer(other){
+  const url=(window.AWAKE_CONFIG||{}).ENDPOINT;
+  if(!url||sent) return;
+  sent=true;
+  const payload={selected:boxes.filter(b=>b.checked).map(b=>+b.value),other:other};
+  fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)})
+    .catch(()=>{sent=false;});
+}
 submit.addEventListener('click',()=>{
   const sel=selected(), n=sel.length;
   const other=document.getElementById('otherText').value.trim();
-  const [title,msg]=verdict(n);
+  sendAnswer(other);
   document.getElementById('rScore').textContent=n;
-  document.getElementById('rTitle').textContent=title;
-  document.getElementById('rMsg').textContent=msg;
+  document.getElementById('rTitle').textContent='アンケートありがとうございました。';
+  document.getElementById('rMsg').textContent='';
+  document.getElementById('rMsg').style.display='none';
   const chips=document.getElementById('rChips'); chips.innerHTML='';
   sel.forEach(s=>{const c=document.createElement('span');c.textContent=s;chips.appendChild(c);});
   if(other){const c=document.createElement('span');c.textContent='その他：'+other;chips.appendChild(c);}
@@ -169,6 +179,7 @@ document.getElementById('copy').addEventListener('click',async()=>{
 });
 
 document.getElementById('reset').addEventListener('click',()=>{
+  sent=false;
   boxes.forEach(b=>b.checked=false);
   document.getElementById('otherText').value='';
   result.classList.remove('show');
